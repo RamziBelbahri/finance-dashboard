@@ -1,26 +1,53 @@
 package com.example.backend.auth;
 
+import com.example.backend.auth.dto.AuthResponse;
+import com.example.backend.auth.dto.LoginRequest;
 import com.example.backend.auth.dto.RegisterRequest;
+import com.example.backend.security.JwtService;
 import com.example.backend.user.User;
 import com.example.backend.user.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepo) {
+    public AuthService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
-    public void register(RegisterRequest registerRequest) {
-        if (userRepo.findByEmail(registerRequest.getEmail()) == null) {
-            User user = new User(registerRequest.getEmail(),registerRequest.getPassword());
-            userRepo.save(user);
-        };
+    public AuthResponse register(RegisterRequest registerRequest) {
+        String email = registerRequest.getEmail(), password = registerRequest.getPassword();
+
+        if (userRepo.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        User user = new User(email, encodedPassword);
+        userRepo.save(user);
+
+        String token = jwtService.generateToken(user.getEmail());
+        return new AuthResponse(token);
+    }
+
+    public AuthResponse login(LoginRequest loginRequest) {
+        String email = loginRequest.getEmail(), password = loginRequest.getPassword();
+        User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        boolean isPasswordValid = passwordEncoder.matches(password, user.getPassword());
+
+        if(!isPasswordValid) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+        return new AuthResponse(token);
     }
 
 }

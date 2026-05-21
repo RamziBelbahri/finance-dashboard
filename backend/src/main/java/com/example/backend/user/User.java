@@ -10,7 +10,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
     public User() {}
@@ -18,10 +22,10 @@ public class User {
         this.email = email;
         this.password = password;
     }
+
     public Long getId() {return this.id;};
     public String getEmail() {return this.email;};
-
-    public void setPassword(String password) {
-        this.password = password;
+    public String getPassword() {
+        return password;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.backend.auth;
 
+import com.example.backend.auth.dto.AuthResponse;
+import com.example.backend.auth.dto.LoginRequest;
 import com.example.backend.auth.dto.RegisterRequest;
 import com.example.backend.user.User;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +19,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody RegisterRequest request) {
-        authService.register(request);
-        return "Registered";
+    public AuthResponse registerUser(@RequestBody RegisterRequest request) {
+        return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse loginUser(@RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 }

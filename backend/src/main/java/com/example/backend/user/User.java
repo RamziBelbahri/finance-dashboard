@@ -1,10 +1,12 @@
 package com.example.backend.user;
 
 
+import com.example.backend.transaction.Transaction;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,16 +18,23 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany(mappedBy = "user")
+    private List<Transaction> transactions;
+
     @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    public User() {}
+    public User() {
+        this.transactions = new ArrayList<>();
+    }
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        this.transactions = new ArrayList<>();
     }
 
     public Long getId() {return this.id;};
@@ -62,5 +71,11 @@ public class User implements UserDetails {
         return true;
     }
 
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
 
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 }

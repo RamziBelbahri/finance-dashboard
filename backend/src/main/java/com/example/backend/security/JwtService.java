@@ -2,6 +2,7 @@ package com.example.backend.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -10,10 +11,24 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final SecretKey key;
+    private final SecretKey key;;
 
-    public JwtService() {
+    public JwtService(UserDetailsServiceImpl userDetailsService) {
         this.key = Jwts.SIG.HS256.key().build();
+    }
+
+    public String extractEmail(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    public boolean isTokenValid(String token, UserDetails user)  {
+        final String email = extractEmail(token);
+        return email.equals(user.getUsername());
     }
 
     public String generateToken(String email) {

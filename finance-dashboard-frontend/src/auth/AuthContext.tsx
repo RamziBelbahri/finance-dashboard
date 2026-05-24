@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { AuthState } from "../models/Auth";
+import type { AuthState } from "../types/Auth";
 
 interface AuthContextType extends AuthState {
     login: (token: string) => void;
@@ -15,7 +15,6 @@ export function AuthProvider({children}: {children: ReactNode}) {
         localStorage.setItem("token", newToken);
         setToken(newToken);
     };
-
 
     const logout = () => {
         localStorage.removeItem("token");

@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final SecretKey key;;
+    private final SecretKey key;
 
     public JwtService(UserDetailsServiceImpl userDetailsService) {
         this.key = Jwts.SIG.HS256.key().build();
@@ -30,10 +30,11 @@ public class JwtService {
     }
 
     public String generateToken(String email) {
+        int HOUR_LONG_TOKEN = 1000 * 60 * 60;
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .expiration(new Date(System.currentTimeMillis() + HOUR_LONG_TOKEN))
                 .signWith(key)
                 .compact();
     }

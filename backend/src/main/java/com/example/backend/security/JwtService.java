@@ -1,6 +1,7 @@
 package com.example.backend.security;
 
 import io.jsonwebtoken.Jwts;
+import org.antlr.v4.runtime.Token;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +31,11 @@ public class JwtService {
     }
 
     public String generateToken(String email) {
-        int HOUR_LONG_TOKEN = 1000 * 60 * 60;
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + HOUR_LONG_TOKEN))
+                .expiration(new Date(System.currentTimeMillis() + TokenSession
+                        .SHORT_TOKEN))
                 .signWith(key)
                 .compact();
     }

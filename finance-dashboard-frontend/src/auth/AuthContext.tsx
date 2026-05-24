@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { AuthState } from "../types/Auth";
+import { isTokenExpired } from "../utils/jwt";
+import { clearAuth } from "./auth";
 
 interface AuthContextType extends AuthState {
     login: (token: string) => void;
@@ -9,7 +11,9 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children: ReactNode}) {
-    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+    const storedToken = localStorage.getItem("token");
+    const validToken = storedToken && !isTokenExpired(storedToken);
+    const [token, setToken] = useState<string | null>( validToken ? storedToken : null);
 
     const login = (newToken: string) => {
         localStorage.setItem("token", newToken);
@@ -17,19 +21,17 @@ export function AuthProvider({children}: {children: ReactNode}) {
     };
 
     const logout = () => {
-        localStorage.removeItem("token");
+        clearAuth();
         setToken(null);
     };
 
     const value: AuthContextType = {
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!token && !isTokenExpired(token),
         login,
         logout
     }
-
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-
 }
 
 export function useAuth() {

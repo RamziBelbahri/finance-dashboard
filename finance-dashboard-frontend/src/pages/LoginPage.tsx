@@ -12,7 +12,6 @@ export default function LoginPage() {
       const password = "secret123";
       const response = await api.post("/auth/login", { email : email, password: password });
       const jwt = response.data.token;
-      console.log(response);
       login(jwt);
       navigate("/dashboard");
     } catch (error) {

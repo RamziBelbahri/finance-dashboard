@@ -13,6 +13,8 @@ public class TransactionResponse {
     private LocalDate transactionDate;
     private TransactionType type;
 
+    public TransactionResponse() {};
+
     public TransactionResponse(Long id, BigDecimal amount, String description, LocalDate transactionDate, TransactionType type) {
         this.id = id;
         this.amount = amount;

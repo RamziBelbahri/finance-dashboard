@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest; // new package
@@ -28,6 +27,8 @@ import tools.jackson.databind.ObjectMapper;
 @WebMvcTest(TransactionController.class)
 class TransactionControllerTest {
 
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
 
@@ -69,7 +70,6 @@ class TransactionControllerTest {
         request.setTransactionDate(LocalDate.of(2026,1,1));
         request.setType(TransactionType.EXPENSE);
         TransactionResponse response = new TransactionResponse(1L, BigDecimal.valueOf(100.0),"Groceries", LocalDate.of(2026,1,1), TransactionType.EXPENSE);
-        ObjectMapper objectMapper = new ObjectMapper();
         when(transactionService.createTransaction(Mockito.any(CreateTransactionRequest.class), Mockito.any(User.class))).thenReturn(response);
         mockMvc.perform(post("/api/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,4 +81,28 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.type").value(TransactionType.EXPENSE.name()));
     }
 
+    @Test
+    @WithMockUser
+    void shouldRejectInvalidTransaction() throws Exception {
+        CreateTransactionRequest invalidRequest = new CreateTransactionRequest();
+        invalidRequest.setDescription("Groceries");
+        invalidRequest.setTransactionDate(LocalDate.of(2026,1,1));
+        invalidRequest.setType(TransactionType.EXPENSE);
+
+        mockMvc.perform(post("/api/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.amount").value("must not be null"))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+
+        invalidRequest.setAmount(BigDecimal.valueOf(-100.0));
+
+        mockMvc.perform(post("/api/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.amount").value("must be greater than 0"))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+    }
 }

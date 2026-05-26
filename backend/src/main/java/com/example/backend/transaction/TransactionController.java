@@ -3,6 +3,7 @@ package com.example.backend.transaction;
 import com.example.backend.transaction.dto.CreateTransactionRequest;
 import com.example.backend.transaction.dto.TransactionResponse;
 import com.example.backend.user.User;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public TransactionResponse createTransaction(@AuthenticationPrincipal User user, @RequestBody CreateTransactionRequest request) {
+    public TransactionResponse createTransaction(@AuthenticationPrincipal User user, @Valid @RequestBody CreateTransactionRequest request) {
         return this.transactionService.createTransaction(request, user);
     }
 

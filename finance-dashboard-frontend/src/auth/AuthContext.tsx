@@ -7,16 +7,19 @@ import { AUTH_LOGOUT_EVENT } from "./authEvents";
 interface AuthContextType extends AuthState {
     login: (token: string) => void;
     logout: () => void;
+    initialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children: ReactNode}) {
+    const [initialized, setInitialized] = useState(false);
     const storedToken = localStorage.getItem("token");
     const validToken = storedToken && !isTokenExpired(storedToken);
     const [token, setToken] = useState<string | null>( validToken ? storedToken : null);
 
     useEffect(() => {
+        setInitialized(true);
         const handleLogout = () => logout();
         window.addEventListener(AUTH_LOGOUT_EVENT, handleLogout);
         return () => {
@@ -55,8 +58,9 @@ export function AuthProvider({children}: {children: ReactNode}) {
         token,
         isAuthenticated: !!token && !isTokenExpired(token),
         login,
-        logout
-    }
+        logout,
+        initialized
+    };
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

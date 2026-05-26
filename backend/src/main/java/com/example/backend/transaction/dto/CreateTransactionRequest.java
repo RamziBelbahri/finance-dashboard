@@ -43,4 +43,5 @@ public class CreateTransactionRequest {
     public void setType(TransactionType type) {
         this.type = type;
     }
+
 }

@@ -2,6 +2,7 @@ import { getTransactions } from "../../api/transactions";
 import TransactionCard from "./TransactionCard";
 import CreateTransaction from "./CreateTransaction";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 export default function DashboardPage() {
   const {
@@ -14,12 +15,22 @@ export default function DashboardPage() {
     queryFn: getTransactions
   });
 
-  const totalIncome = transactions.filter(t => t.type === "INCOME").reduce((acc, cur) => acc += cur.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === "EXPENSE").reduce((acc, cur) => acc += cur.amount, 0);
-  const balance = totalIncome - totalExpense;
-  const sortedTransactions = [...transactions].sort(
-    (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
-  )
+  const summary = useMemo(() => transactions.reduce((acc, cur) => {
+    (cur.type === "INCOME") ? acc.income += cur.amount : acc.expense += cur.amount;
+    return acc;
+  }
+    , {
+      income: 0,
+      expense: 0
+    })
+    , [transactions])
+  const balance = useMemo(() =>
+    (summary.income - summary.expense), [transactions]);
+  const sortedTransactions = useMemo(() =>
+    [...transactions].sort(
+      (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
+    )
+    , [transactions]);
 
   return (
     <div className="min-h-screen bg-blue-200 p-6 text-black">
@@ -35,11 +46,11 @@ export default function DashboardPage() {
           </div>
           <div className="bg-white rounded-xl p-4 shadow">
             <h3 className="text-gray-500">Income</h3>
-            <p className="text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-green-600">${summary.income.toFixed(2)}</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow">
             <h3 className="text-gray-500">Expenses</h3>
-            <p className="text-2xl font-bold text-red-600">${totalExpense.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-red-600">${summary.expense.toFixed(2)}</p>
           </div>
         </div>
         {

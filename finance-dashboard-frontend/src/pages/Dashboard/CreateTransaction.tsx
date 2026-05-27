@@ -1,9 +1,22 @@
 import { useState, type ChangeEvent } from "react";
-import { TRANSACTION_URL, type Transaction, type TransactionType } from "../../types/transaction";
+import { TRANSACTION_URL, type TransactionType } from "../../types/transaction";
 import type { CreateTransactionRequest } from "../../api/transactions";
 import api from "../../api/axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function CreateTransaction({ loadTransactions }: { loadTransactions: () => Promise<Transaction[] | void> }) {
+export default function CreateTransaction() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (newTransaction: CreateTransactionRequest) => {
+      return api.post(TRANSACTION_URL, newTransaction);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["transactions"]
+      })
+    }
+  });
+  
   const [transactionDetails, setTransactionDetails] = useState({
     amount: "",
     description: "",
@@ -25,8 +38,7 @@ export default function CreateTransaction({ loadTransactions }: { loadTransactio
   const handleSubmit = async () => {
     try {
       const newTransaction: CreateTransactionRequest = { ...transactionDetails, amount: Number(transactionDetails.amount), transactionDate: transactionDetails.date };
-      await api.post(TRANSACTION_URL, newTransaction);
-      await loadTransactions();
+      await mutation.mutateAsync(newTransaction);
       setTransactionDetails(
         {
           amount: "",

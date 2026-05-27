@@ -35,7 +35,7 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + TokenSession
-                        .SHORT_TOKEN))
+                        .HOUR_LONG_TOKEN))
                 .signWith(key)
                 .compact();
     }

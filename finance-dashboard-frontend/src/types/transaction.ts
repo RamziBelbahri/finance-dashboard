@@ -11,3 +11,9 @@ export interface Transaction {
     transactionDate: string;
     type: TransactionType;
 }
+
+export interface TransactionSummary {
+    title: string;
+    color: string;
+    value: number
+}

@@ -2,7 +2,8 @@ import { getTransactions } from "../../api/transactions";
 import TransactionCard from "./TransactionCard";
 import CreateTransaction from "./CreateTransaction";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import SummaryCard from "./SummaryCard";
 
 export default function DashboardPage() {
   const {
@@ -14,6 +15,7 @@ export default function DashboardPage() {
     queryKey: ["transactions"],
     queryFn: getTransactions
   });
+  const [filter, setFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
 
   const summary = useMemo(() => transactions.reduce((acc, cur) => {
     (cur.type === "INCOME") ? acc.income += cur.amount : acc.expense += cur.amount;
@@ -26,11 +28,15 @@ export default function DashboardPage() {
     , [transactions])
   const balance = useMemo(() =>
     (summary.income - summary.expense), [transactions]);
+  const filteredTransactions = useMemo(() => {
+    if (filter === "ALL") return transactions;
+    return [...transactions].filter(t => t.type === filter);
+  }, [filter, transactions])
   const sortedTransactions = useMemo(() =>
-    [...transactions].sort(
+    [...filteredTransactions].sort(
       (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
     )
-    , [transactions]);
+    , [filteredTransactions]);
 
   return (
     <div className="min-h-screen bg-blue-200 p-6 text-black">
@@ -40,19 +46,15 @@ export default function DashboardPage() {
           <CreateTransaction />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow">
-            <h3 className="text-gray-500">Balance</h3>
-            <p className="text-2xl font-bold text-600">${balance.toFixed(2)}</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow">
-            <h3 className="text-gray-500">Income</h3>
-            <p className="text-2xl font-bold text-green-600">${summary.income.toFixed(2)}</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow">
-            <h3 className="text-gray-500">Expenses</h3>
-            <p className="text-2xl font-bold text-red-600">${summary.expense.toFixed(2)}</p>
-          </div>
+          <SummaryCard title="Balance" color="text-600" value={balance} />
+          <SummaryCard title="Income" color="text-green-600" value={summary.income} />
+          <SummaryCard title="Expense" color="text-red-600" value={summary.expense} />
         </div>
+        <select value={filter} onChange={e => setFilter(e.target.value as "ALL" | "INCOME" | "EXPENSE")}>
+          <option value="ALL" >ALL</option>
+          <option value="INCOME" >INCOME</option>
+          <option value="EXPENSE" >EXPENSE</option>
+        </select>
         {
           (error && !isLoading) &&
           <div className="text-red-400 text-center mt-10">

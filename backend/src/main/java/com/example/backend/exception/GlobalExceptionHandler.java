@@ -1,6 +1,7 @@
 package com.example.backend.exception;
 
 import com.example.backend.exception.dto.ErrorResponse;
+import com.example.backend.exception.dto.UserAlreadyExistsException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,5 +26,18 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(400, "Validation failed", errors);
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+
+        ErrorResponse response =
+                new ErrorResponse(
+                        409,
+                        ex.getMessage(),
+                        null
+                );
+
+        return ResponseEntity.status(409).body(response);
     }
 }

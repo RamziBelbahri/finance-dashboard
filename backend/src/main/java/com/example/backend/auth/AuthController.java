@@ -3,6 +3,7 @@ package com.example.backend.auth;
 import com.example.backend.auth.dto.AuthResponse;
 import com.example.backend.auth.dto.LoginRequest;
 import com.example.backend.auth.dto.RegisterRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +17,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public AuthResponse registerUser(@RequestBody RegisterRequest request) {
+    public AuthResponse registerUser(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
-    public AuthResponse loginUser(@RequestBody LoginRequest request) {
+    public AuthResponse loginUser(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }

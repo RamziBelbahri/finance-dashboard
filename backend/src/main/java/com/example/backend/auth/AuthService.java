@@ -3,6 +3,7 @@ package com.example.backend.auth;
 import com.example.backend.auth.dto.AuthResponse;
 import com.example.backend.auth.dto.LoginRequest;
 import com.example.backend.auth.dto.RegisterRequest;
+import com.example.backend.exception.dto.UserAlreadyExistsException;
 import com.example.backend.security.JwtService;
 import com.example.backend.user.User;
 import com.example.backend.user.UserRepository;
@@ -26,7 +27,7 @@ public class AuthService {
         String email = registerRequest.getEmail(), password = registerRequest.getPassword();
 
         if (userRepo.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
+            throw new UserAlreadyExistsException("Email already exists");
         }
 
         String encodedPassword = passwordEncoder.encode(password);

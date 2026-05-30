@@ -110,8 +110,8 @@ export default function LoginPage() {
 
           <p className="mt-10 text-center text-sm/6 text-gray-400">
             Not a member?{' '}
-            <a href="#" className="font-semibold text-blue-400 hover:text-blue-900">
-              Start a 14 day free trial
+            <a href="/register" className="font-semibold text-blue-400 hover:text-blue-900">
+              Register a new account
             </a>
           </p>
         </div>

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { clearAuth } from "../auth/auth";
 import { AUTH_LOGOUT_EVENT } from "../auth/authEvents";
 
 const api = axios.create({

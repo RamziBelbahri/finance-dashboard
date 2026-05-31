@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -25,7 +26,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionResponse> getUserTransactions(@AuthenticationPrincipal User user) {
-        return this.transactionService.getUserTransactions(user);
+    public List<TransactionResponse> getUserTransactions(@AuthenticationPrincipal User user,
+                                                         @RequestParam (required = false) TransactionType type) {
+        return this.transactionService.getUserTransactions(user, type);
     }
 }

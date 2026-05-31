@@ -8,10 +8,13 @@ export interface CreateTransactionRequest {
     type: TransactionType;
 }
 
-export const getTransactions = async () => {
-    const response = await api.get<Transaction[]>(TRANSACTION_URL);
+export const getTransactions = async (transactionType: "ALL" | "INCOME" | "EXPENSE") => {
+    const type = (transactionType === "ALL") ? undefined : transactionType;
+    const response = await api.get<Transaction[]>(TRANSACTION_URL, { params : { type } });
+    console.log(response);
     return response.data;
 }
+
 
 export const createTransaction = async (transaction: CreateTransactionRequest) => {
     const response = await api.post(TRANSACTION_URL, transaction);

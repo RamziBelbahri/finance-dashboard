@@ -140,7 +140,7 @@ export default function RegisterPage() {
                 className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold text-white
     ${loading ? "bg-gray-600" : "bg-blue-800 hover:bg-blue-900"}`}
               >
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? "Registering..." : "Register"}
               </button>
             </div>
           </form>

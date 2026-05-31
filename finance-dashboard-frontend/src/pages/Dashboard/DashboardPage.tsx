@@ -6,16 +6,16 @@ import { useMemo, useState } from "react";
 import SummaryCard from "./SummaryCard";
 
 export default function DashboardPage() {
+  const [filter, setFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
   const {
     data: transactions = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ["transactions"],
-    queryFn: getTransactions
+    queryKey: ["transactions", filter],
+    queryFn: () => getTransactions(filter)
   });
-  const [filter, setFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
 
   const summary = useMemo(() => transactions.reduce((acc, cur) => {
     (cur.type === "INCOME") ? acc.income += cur.amount : acc.expense += cur.amount;
@@ -28,15 +28,11 @@ export default function DashboardPage() {
     , [transactions])
   const balance = useMemo(() =>
     (summary.income - summary.expense), [transactions]);
-  const filteredTransactions = useMemo(() => {
-    if (filter === "ALL") return transactions;
-    return [...transactions].filter(t => t.type === filter);
-  }, [filter, transactions])
   const sortedTransactions = useMemo(() =>
-    [...filteredTransactions].sort(
+    [...transactions].sort(
       (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
     )
-    , [filteredTransactions]);
+    , [transactions]);
 
   return (
     <div className="min-h-screen bg-blue-200 p-6 text-black">

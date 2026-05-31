@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,7 +53,7 @@ class TransactionControllerTest {
         t2.setDescription("Salary");
         t2.setTransactionDate(LocalDate.of(2026,1,2));
         t2.setType(TransactionType.INCOME);
-        when(transactionService.getUserTransactions(Mockito.any(User.class))).thenReturn(List.of(t1, t2));
+        when(transactionService.getUserTransactions(Mockito.any(User.class), Mockito.any())).thenReturn(List.of(t1, t2));
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))

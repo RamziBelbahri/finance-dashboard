@@ -92,7 +92,7 @@ public class TransactionServiceTest {
 
         List<Transaction> mockList = List.of(t1, t2);
         when(transactionRepo.findByUser(user)).thenReturn(mockList);
-        List<TransactionResponse> result = transactionService.getUserTransactions(user);
+        List<TransactionResponse> result = transactionService.getUserTransactions(user, null);
 
         assertThat(result)
                 .hasSize(mockList.size())

@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,7 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch(Exception ignored) {
+        } catch(JwtException ex) {
+            SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);
     }

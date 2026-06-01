@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,5 +30,10 @@ public class TransactionController {
     public List<TransactionResponse> getUserTransactions(@AuthenticationPrincipal User user,
                                                          @RequestParam (required = false) TransactionType type) {
         return this.transactionService.getUserTransactions(user, type);
+    }
+
+    @GetMapping("/summary")
+    public TransactionSummary getUserSummary(@AuthenticationPrincipal User user) {
+        return this.transactionService.getSummary(user);
     }
 }

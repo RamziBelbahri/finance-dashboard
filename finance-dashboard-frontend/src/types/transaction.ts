@@ -12,8 +12,14 @@ export interface Transaction {
     type: TransactionType;
 }
 
-export interface TransactionSummary {
+export interface SummaryCardProps {
     title: string;
     color: string;
     value: number
+}
+
+export interface TransactionSummary {
+    totalIncome: number;
+    totalExpense: number;
+    balance: number;
 }

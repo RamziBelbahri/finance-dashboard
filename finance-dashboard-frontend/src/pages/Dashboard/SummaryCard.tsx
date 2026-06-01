@@ -1,6 +1,6 @@
-import type { TransactionSummary } from "../../types/transaction";
+import type { SummaryCardProps } from "../../types/transaction";
 
-export default function SummaryCard( {title, color, value} : TransactionSummary) {
+export default function SummaryCard( {title, color, value} : SummaryCardProps) {
     return(
         <div className="bg-white rounded-xl p-4 shadow">
             <h3 className="text-gray-500">{title}</h3>

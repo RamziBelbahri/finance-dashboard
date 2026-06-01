@@ -1,4 +1,4 @@
-import { getTransactions } from "../../api/transactions";
+import { getSummary, getTransactions } from "../../api/transactions";
 import TransactionCard from "./TransactionCard";
 import CreateTransaction from "./CreateTransaction";
 import { useQuery } from "@tanstack/react-query";
@@ -17,17 +17,11 @@ export default function DashboardPage() {
     queryFn: () => getTransactions(filter)
   });
 
-  const summary = useMemo(() => transactions.reduce((acc, cur) => {
-    (cur.type === "INCOME") ? acc.income += cur.amount : acc.expense += cur.amount;
-    return acc;
-  }
-    , {
-      income: 0,
-      expense: 0
-    })
-    , [transactions])
-  const balance = useMemo(() =>
-    (summary.income - summary.expense), [transactions]);
+  const { data: summary } = useQuery({
+    queryKey: ["transactions-summary"],
+    queryFn: getSummary
+  });
+
   const sortedTransactions = useMemo(() =>
     [...transactions].sort(
       (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
@@ -42,9 +36,9 @@ export default function DashboardPage() {
           <CreateTransaction />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <SummaryCard title="Balance" color="text-600" value={balance} />
-          <SummaryCard title="Income" color="text-green-600" value={summary.income} />
-          <SummaryCard title="Expense" color="text-red-600" value={summary.expense} />
+          <SummaryCard title="Balance" color="text-600" value={summary?.balance ?? 0} />
+          <SummaryCard title="Income" color="text-green-600" value={summary?.totalIncome ?? 0} />
+          <SummaryCard title="Expense" color="text-red-600" value={summary?.totalExpense ?? 0} />
         </div>
         <select value={filter} onChange={e => setFilter(e.target.value as "ALL" | "INCOME" | "EXPENSE")}>
           <option value="ALL" >ALL</option>

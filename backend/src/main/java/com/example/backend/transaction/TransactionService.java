@@ -5,6 +5,7 @@ import com.example.backend.transaction.dto.TransactionResponse;
 import com.example.backend.user.User;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -40,5 +41,13 @@ public class TransactionService {
             transactions = transactionRepo.findByUser(user);
         }
         return transactions.stream().map(this::mapToResponse).toList();
+    }
+
+    public TransactionSummary getSummary(User user) {
+        List<TransactionResponse> incomes = this.getUserTransactions(user, TransactionType.INCOME);
+        List<TransactionResponse> expenses = this.getUserTransactions(user, TransactionType.EXPENSE);
+        double totalIncome = incomes.stream().mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
+        double totalExpense = expenses.stream().mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
+        return new TransactionSummary(totalIncome, totalExpense, totalIncome - totalExpense);
     }
 }

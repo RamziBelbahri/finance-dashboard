@@ -14,6 +14,10 @@ export default function CreateTransaction() {
       queryClient.invalidateQueries({
         queryKey: ["transactions"]
       })
+
+      queryClient.invalidateQueries({
+        queryKey: ["transactions-summary"]
+      })
     }
   });
 

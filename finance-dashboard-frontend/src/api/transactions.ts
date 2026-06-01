@@ -1,4 +1,4 @@
-import { TRANSACTION_URL, type Transaction, type TransactionType } from "../types/transaction";
+import { TRANSACTION_URL, type Transaction, type TransactionSummary, type TransactionType } from "../types/transaction";
 import api from "./axios";
 
 export interface CreateTransactionRequest {
@@ -11,6 +11,11 @@ export interface CreateTransactionRequest {
 export const getTransactions = async (transactionType: "ALL" | "INCOME" | "EXPENSE") => {
     const type = (transactionType === "ALL") ? undefined : transactionType;
     const response = await api.get<Transaction[]>(TRANSACTION_URL, { params : { type } });
+    return response.data;
+}
+
+export const getSummary = async () => {
+    const response = await api.get<TransactionSummary>(TRANSACTION_URL + "/summary");
     console.log(response);
     return response.data;
 }
